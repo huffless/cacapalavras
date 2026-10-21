@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101c2a">
+  <title>Palavra de Feira — um desafio por dia</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f5f6f2;
+      --muted: #c1cbd3;
+      --night: #101c2a;
+      --panel: #192a3a;
+      --panel-raised: #22374a;
+      --line: #52677a;
+      --lime: #d4ff69;
+      --coral: #ff927d;
+      --blue: #9ddcff;
+      --focus: #fff48c;
+      --radius: 1rem;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 75% 4%, #24394a 0, transparent 35rem),
+        var(--night);
+      line-height: 1.5;
+    }
+    button, select { font: inherit; }
+    input { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--blue); }
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 6px #101c2a;
+      position: relative;
+      z-index: 2;
+    }
+    .skip-link {
+      position: absolute; left: 1rem; top: -5rem; z-index: 10;
+      background: var(--focus); color: #101c2a; padding: .75rem 1rem;
+      border-radius: .5rem; font-weight: 800;
+    }
+    .skip-link:focus { top: 1rem; }
+    .shell { width: min(1160px, calc(100% - 2rem)); margin: auto; }
+    .topbar {
+      min-height: 76px; display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; border-bottom: 1px solid #34495a;
+    }
+    .brand { display: flex; align-items: center; gap: .7rem; color: var(--ink); text-decoration: none; }
+    .brand-mark {
+      width: 38px; aspect-ratio: 1; display: grid; place-items: center;
+      border-radius: 12px; color: var(--night); background: var(--lime); font-size: 1.3rem; font-weight: 900;
+    }
+    .brand-name { font-weight: 850; letter-spacing: -.04em; font-size: 1.15rem; }
+    .top-actions { display: flex; align-items: center; gap: .65rem; }
+    .top-actions button, .utility-button, .mode-button, .submit-button {
+      border: 1px solid var(--line); background: var(--panel); border-radius: .7rem;
+      padding: .62rem .85rem; font-weight: 750; cursor: pointer;
+    }
+    .top-actions button:hover, .utility-button:hover, .mode-button:hover { background: var(--panel-raised); }
+    .top-actions .icon-button { width: 42px; height: 42px; padding: 0; font-size: 1.1rem; }
+    main { padding: 2.2rem 0 3rem; }
+    .intro { max-width: 760px; margin: 0 auto 1.5rem; text-align: center; }
+    .eyebrow { color: var(--lime); font-size: .78rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: .25rem 0 .35rem; font-size: clamp(2rem, 5vw, 3.35rem); line-height: 1.06; letter-spacing: -.055em; }
+    .intro p { margin: .5rem 0 0; color: var(--muted); }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .75fr); gap: 1.25rem; align-items: start; }
+    .game-card, .side-card {
+      background: linear-gradient(145deg, #1b2d3e, #172636);
+      border: 1px solid #42596b; border-radius: var(--radius);
+      box-shadow: 0 18px 45px #07111b55;
+    }
+    .game-card { padding: clamp(1rem, 3vw, 1.65rem); }
+    .challenge-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .challenge-line h2 { margin: 0; font-size: 1.24rem; }
+    .date-label { color: var(--muted); font-size: .86rem; margin-top: .15rem; }
+    .mode-pill { flex: none; color: var(--night); background: var(--lime); font-size: .76rem; font-weight: 900; border-radius: 999px; padding: .25rem .7rem; }
+    .clue-box {
+      display: flex; align-items: center; gap: .85rem; margin: 1.25rem 0;
+      background: #101c2a; border-left: 4px solid var(--coral); border-radius: .55rem; padding: .8rem 1rem;
+    }
+    .clue-icon { font-size: 1.5rem; }
+    .clue-box strong { display: block; }
+    .clue-box span:last-child { color: var(--muted); font-size: .9rem; }
+    .board-wrap { max-width: 340px; margin: 0 auto 1rem; }
+    .board-heading { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: .55rem; color: var(--muted); font-size: .82rem; }
+    .board {
+      display: grid; gap: .42rem; width: min(100%, 324px); margin: auto;
+    }
+    .guess-row { display: grid; grid-template-columns: repeat(var(--word-length, 5), minmax(0, 1fr)); gap: .42rem; }
+    .tile {
+      position: relative; aspect-ratio: 1; display: grid; place-items: center; border: 2px solid #63788a;
+      border-radius: .48rem; background: #142332; font-size: clamp(1.25rem, 5vw, 1.65rem);
+      line-height: 1; font-weight: 900; text-transform: uppercase;
+    }
+    .tile.filled { border-color: #bdcbd4; animation: pop .12s ease-out; }
+    .tile.correct { background: #285f42; border-color: #80e6a8; }
+    .tile.present { background: #765423; border-color: #ffd174; }
+    .tile.absent { background: #344454; border-color: #8494a2; }
+    .tile.correct::after, .tile.present::after, .tile.absent::after {
+      position: absolute; right: .18rem; top: .12rem; font-size: .7rem; line-height: 1;
+      font-weight: 950; text-transform: none;
+    }
+    .tile.correct::after { content: "✓"; }
+    .tile.present::after { content: "↔"; }
+    .tile.absent::after { content: "×"; }
+    .tile.current { border-color: var(--lime); }
+    @keyframes pop { from { transform: scale(.88); } to { transform: scale(1); } }
+    .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 1rem; color: var(--muted); font-size: .78rem; margin: .8rem 0 1.15rem; }
+    .legend span { display: inline-flex; align-items: center; gap: .4rem; }
+    .legend i {
+      width: 18px; height: 18px; display: inline-grid; place-items: center;
+      border-radius: 4px; border: 1px solid #fff8; color: #fff; font-size: .75rem;
+      font-style: normal; font-weight: 950;
+    }
+    .legend .l-correct { background: #285f42; }
+    .legend .l-present { background: #765423; }
+    .legend .l-absent { background: #344454; }
+    .legend .l-correct::after { content: "✓"; }
+    .legend .l-present::after { content: "↔"; }
+    .legend .l-absent::after { content: "×"; }
+    .keyboard-instructions {
+      margin: 0 0 .65rem; text-align: center; color: var(--muted); font-size: .83rem;
+    }
+    .guess-entry { max-width: 520px; margin: 0 auto 1rem; }
+    .guess-entry label { display: block; margin-bottom: .35rem; font-weight: 800; }
+    .guess-entry-row { display: flex; gap: .55rem; }
+    .guess-input {
+      min-width: 0; flex: 1; padding: .65rem .75rem; color: var(--ink);
+      background: #101c2a; border: 2px solid #8193a2; border-radius: .55rem;
+      text-transform: uppercase; letter-spacing: .12em;
+    }
+    .guess-help { margin: .35rem 0 0; color: var(--muted); font-size: .8rem; }
+    .submit-button { background: var(--lime); color: #13202a; border-color: var(--lime); }
+    .submit-button:hover { background: #e0ff91; }
+    .keyboard { max-width: 520px; margin: auto; display: grid; gap: .42rem; }
+    .key-row { display: flex; justify-content: center; gap: .35rem; }
+    .key-row.accent-row { flex-wrap: wrap; }
+    .accent-row .key { flex: 0 0 2.6rem; }
+    .key {
+      min-width: 0; flex: 1; min-height: 46px; padding: .3rem .2rem;
+      background: #42566a; border: 1px solid #718598; border-radius: .45rem;
+      font-size: .9rem; font-weight: 850; cursor: pointer;
+    }
+    .key:hover { background: #566d82; }
+    .key.wide { flex: 1.55; font-size: .75rem; }
+    .key.key-correct { background: #285f42; border-color: #80e6a8; }
+    .key.key-present { background: #765423; border-color: #ffd174; }
+    .key.key-absent { background: #344454; border-color: #8494a2; }
+    .key.key-correct::after, .key.key-present::after, .key.key-absent::after {
+      display: block; font-size: .68rem; line-height: 1; font-weight: 950;
+    }
+    .key.key-correct::after { content: "✓"; }
+    .key.key-present::after { content: "↔"; }
+    .key.key-absent::after { content: "×"; }
+    .game-status { min-height: 2.5rem; margin: .7rem auto 0; max-width: 520px; text-align: center; font-weight: 700; color: var(--lime); }
+    .side-column { display: grid; gap: 1rem; }
+    .side-card { padding: 1.15rem; }
+    .side-card h2 { margin: 0 0 .8rem; font-size: 1.08rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; text-align: center; }
+    .stat { padding: .65rem .3rem; background: #101c2a; border-radius: .65rem; }
+    .stat strong { display: block; font-size: 1.55rem; line-height: 1.2; }
+    .stat span { display: block; color: var(--muted); font-size: .72rem; }
+    .streak-line { margin: .8rem 0 0; color: var(--muted); font-size: .87rem; }
+    .utility-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+    .utility-button { font-size: .85rem; }
+    .utility-button.primary { background: var(--lime); color: #13202a; border-color: var(--lime); }
+    .utility-button.primary:hover { background: #e0ff91; }
+    .training-card p, .premium-card p { color: var(--muted); font-size: .87rem; margin: -.25rem 0 .8rem; }
+    .clue-box span:last-child { display: block; }
+    .training-select { width: 100%; padding: .65rem .75rem; color: var(--ink); background: #101c2a; border: 1px solid #8193a2; border-radius: .55rem; }
+    .training-card label { display: block; margin: .55rem 0 .3rem; font-size: .85rem; font-weight: 750; }
+    .training-card .utility-button { width: 100%; margin-top: .55rem; }
+    .premium-card { background: linear-gradient(140deg, #3c3147, #1c2a3a); border-color: #8c7799; }
+    .premium-card h2 { color: #f0c6ff; }
+    .premium-card .utility-button { width: 100%; }
+    footer { color: var(--muted); border-top: 1px solid #34495a; padding: 1rem 0 1.5rem; font-size: .8rem; }
+    .footer-row { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    dialog {
+      width: min(460px, calc(100% - 2rem)); padding: 1.4rem; color: var(--ink);
+      background: #192a3a; border: 1px solid #8293a0; border-radius: 1rem;
+      box-shadow: 0 20px 70px #000b;
+    }
+    dialog::backdrop { background: #06101bd9; }
+    dialog h2 { margin: 0 0 .5rem; }
+    dialog p { color: var(--muted); }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: .65rem; margin-top: 1rem; }
+    .visually-hidden {
+      position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats-card { grid-column: 1 / -1; }
+    }
+    @media (max-width: 540px) {
+      .shell { width: min(100% - 1rem, 440px); }
+      .topbar { min-height: 64px; }
+      .brand-name { font-size: 1rem; }
+      .top-actions button:not(.icon-button) { padding: .55rem .65rem; font-size: .82rem; }
+      main { padding-top: 1.55rem; }
+      .side-column { grid-template-columns: 1fr; }
+      .stats-card { grid-column: auto; }
+      .key { min-height: 44px; }
+      .guess-entry-row { align-items: stretch; }
+      .submit-button { padding-inline: .7rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media (forced-colors: active) {
+      .tile, .key, .mode-pill, .clue-box { forced-color-adjust: auto; }
+      .tile.correct, .key.key-correct { border-style: double; border-width: 4px; }
+      .tile.present, .key.key-present { border-style: dashed; }
+      .tile.absent, .key.key-absent { border-style: dotted; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o jogo</a>
+  <header class="shell topbar">
+    <a class="brand" href="#conteudo" aria-label="Palavra de Feira, início">
+      <span class="brand-mark" aria-hidden="true">P</span><span class="brand-name">palavra de feira</span>
+    </a>
+    <nav class="top-actions" aria-label="Ações do jogo">
+      <button type="button" id="shareTop" aria-label="Compartilhar resultado sem revelar a palavra">Compartilhar</button>
+      <button type="button" class="icon-button" id="helpOpen" aria-label="Como jogar">?</button>
+    </nav>
+  </header>
+
+  <main id="conteudo" class="shell" tabindex="-1">
+    <div class="intro">
+      <div class="eyebrow">Uma pista. Seis chances. Todo dia.</div>
+      <h1>Que palavra está na banca?</h1>
+      <p>Descubra a palavra de hoje usando a categoria e as pistas de cada tentativa.</p>
+    </div>
+    <div class="layout">
+      <section class="game-card" aria-labelledby="challengeTitle">
+        <div class="challenge-line">
+          <div>
+            <h2 id="challengeTitle">Desafio diário</h2>
+            <div class="date-label" id="dateLabel"></div>
+          </div>
+          <span class="mode-pill" id="modePill">DO DIA</span>
+        </div>
+        <div class="clue-box" aria-label="Categoria do desafio">
+          <span class="clue-icon" aria-hidden="true">◉</span>
+          <div><strong id="categoryLabel">Categoria: frutas</strong><span id="themeLabel">Tema: cores e sabores da feira</span></div>
+        </div>
+        <div class="board-wrap">
+          <div class="board-heading"><span>Suas tentativas</span><span id="attemptCounter">0 de 6</span></div>
+          <div class="board" id="board" role="group" aria-label="Tabuleiro: seis linhas de cinco letras. Vazio no início."></div>
+        </div>
+        <div class="legend" aria-label="Significado das pistas">
+          <span><i class="l-correct" aria-hidden="true"></i>Letra certa, no lugar certo</span>
+          <span><i class="l-present" aria-hidden="true"></i>Letra certa, em outro lugar</span>
+          <span><i class="l-absent" aria-hidden="true"></i>Letra não aparece</span>
+        </div>
+        <p class="keyboard-instructions" id="keyboardHelp">Digite no campo, use o teclado físico ou as teclas na tela. Acentos são diferentes de letras sem acento.</p>
+        <form class="guess-entry" id="guessForm" novalidate>
+          <label for="guessInput" id="guessLabel">Seu palpite (5 letras)</label>
+          <div class="guess-entry-row">
+            <input class="guess-input" id="guessInput" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="guessHelp">
+            <button class="submit-button" type="submit">Enviar palpite</button>
+          </div>
+          <p class="guess-help" id="guessHelp">Digite as letras com os acentos corretos. Palpites inválidos não gastam tentativa.</p>
+        </form>
+        <div class="keyboard" id="keyboard" role="group" aria-label="Teclado virtual para digitar a palavra"></div>
+        <p class="game-status" id="gameStatus"></p>
+      </section>
+
+      <aside class="side-column" aria-label="Informações e modos de jogo">
+        <section class="side-card stats-card" aria-labelledby="statsTitle">
+          <h2 id="statsTitle">Seu caminho</h2>
+          <div class="stats-grid" aria-label="Estatísticas do jogo">
+            <div class="stat"><strong id="playedStat">0</strong><span>partidas</span></div>
+            <div class="stat"><strong id="winStat">0%</strong><span>acertos</span></div>
+            <div class="stat"><strong id="streakStat">0</strong><span>sequência</span></div>
+          </div>
+          <p class="streak-line" id="streakMessage">Cada dia é uma nova chance de manter a sequência.</p>
+        </section>
+        <section class="side-card" aria-labelledby="dailyActionsTitle">
+          <h2 id="dailyActionsTitle">Depois da rodada</h2>
+          <div class="utility-actions">
+            <button class="utility-button primary" id="shareButton" type="button">Compartilhar</button>
+            <button class="utility-button" id="newDailyButton" type="button" aria-label="Voltar ao desafio diário">Voltar ao diário</button>
+          </div>
+        </section>
+        <section class="side-card training-card" aria-labelledby="trainingTitle">
+          <h2 id="trainingTitle">Treino sem pressão</h2>
+          <p>Escolha uma dificuldade para iniciar um treino. O treino não altera suas estatísticas diárias.</p>
+          <label for="trainingSelect">Dificuldade do treino</label>
+          <select class="training-select" id="trainingSelect" aria-describedby="trainingHelp">
+            <option value="facil">Fácil · 4–5 letras · 8 palpites</option>
+            <option value="medio">Médio · 5 letras · 6 palpites</option>
+            <option value="dificil">Difícil · 6–7 letras · 5 palpites</option>
+          </select>
+          <span class="visually-hidden" id="trainingHelp">Ao escolher uma opção, um novo treino começa. Use o botão Voltar ao diário para retornar ao desafio do dia.</span>
+          <button class="utility-button" id="restartTrainingButton" type="button">Reiniciar treino</button>
+        </section>
+        <section class="side-card premium-card" aria-labelledby="archiveTitle">
+          <h2 id="archiveTitle">Arquivo da banca ✦</h2>
+          <p>Reviva desafios anteriores e descubra novas categorias com o passe premium.</p>
+          <button class="utility-button" id="archiveButton" type="button">Conhecer o arquivo</button>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <footer>
+    <div class="shell footer-row"><span>Um jogo de palavras feito para todo mundo.</span><span>Desafio diário · 5 letras · 6 tentativas</span></div>
+  </footer>
+  <div class="visually-hidden" id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <dialog id="infoDialog" aria-labelledby="dialogTitle" aria-describedby="dialogBody">
+    <h2 id="dialogTitle">Como jogar</h2>
+    <p id="dialogBody">No desafio diário, adivinhe a palavra de cinco letras em até seis tentativas. No treino, escolha Fácil (4 ou 5 letras, 8 palpites), Médio (5 letras, 6 palpites) ou Difícil (6 ou 7 letras, 5 palpites). Acentos fazem diferença; maiúsculas e minúsculas não. Cada letra recebe uma pista textual e visual: certa no lugar certo, presente em outra posição ou ausente.</p>
+    <p>Digite letras pelo teclado físico ou pelas teclas da tela. Pressione Enter para enviar e Backspace para apagar. Não precisa usar o mouse.</p>
+    <div class="dialog-actions"><button class="utility-button" type="button" id="dialogClose">Entendi</button></div>
+  </dialog>
+
+  <script>
+    (function () {
+      "use strict";
+      const DAILY = { answer: "MANGA", category: "Categoria: frutas", theme: "Desafio demonstrativo offline · acentos são significativos" };
+      const TRAINING = {
+        facil: { answers: ["CASA", "PERAS"], category: "Nível fácil", theme: "4 ou 5 letras · 8 palpites" },
+        medio: { answer: "MANGA", category: "Nível médio", theme: "5 letras · 6 palpites" },
+        dificil: { answers: ["LIMÕES", "PÊSSEGO"], category: "Nível difícil", theme: "6 ou 7 letras · 5 palpites" }
+      };
+      const DEMO_WORDS = ["MANGA", "MAÇÃS", "PERAS", "TIGRE", "LIVRO", "CASA", "GATO", "DOCE", "LARANJA", "MORANGO", "JANELA", "LIMÕES", "LIMÃO", "PÊSSEGO"];
+      const LIMITS = { daily: 6, facil: 8, medio: 6, dificil: 5 };
+      const today = new Date();
+      const dateKey = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+      const dateText = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(today);
+      document.getElementById("dateLabel").textContent = dateText.charAt(0).toUpperCase() + dateText.slice(1);
+      const board = document.getElementById("board");
+      const keyboard = document.getElementById("keyboard");
+      const status = document.getElementById("gameStatus");
+      const announcer = document.getElementById("announcer");
+      const guessForm = document.getElementById("guessForm");
+      const guessInput = document.getElementById("guessInput");
+      const guessLabel = document.getElementById("guessLabel");
+      const attemptCounter = document.getElementById("attemptCounter");
+      const keyboardButtons = new Map();
+      const rows = [];
+      let mode = "daily";
+      let puzzle = DAILY;
+      let trainingLevel = "facil";
+      let guesses = [];
+      let current = "";
+      let finished = false;
+      let gameStats = { played: 0, won: 0, streak: 0, lastDate: "" };
+      const storageKey = "palavra-feira-v1";
+
+      let storageError = false;
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        if (saved.stats && typeof saved.stats === "object") {
+          ["played", "won", "streak"].forEach(function (key) {
+            if (Number.isInteger(saved.stats[key]) && saved.stats[key] >= 0) gameStats[key] = saved.stats[key];
+          });
+          if (typeof saved.stats.lastDate === "string") gameStats.lastDate = saved.stats.lastDate;
+        }
+        if (saved.daily && saved.daily.date === dateKey) {
+          const restored = Array.isArray(saved.daily.guesses) ? saved.daily.guesses : [];
+          guesses = restored.filter(function (guess) {
+            return guess && typeof guess.word === "string" && wordLength(guess.word) === 5 &&
+              Array.isArray(guess.result) && guess.result.length === 5 && guess.result.every(isResult);
+          }).slice(0, LIMITS.daily).map(function (guess) { return { word: normalize(guess.word), result: guess.result.slice() }; });
+          finished = Boolean(saved.daily.finished) || guesses.length >= LIMITS.daily || guesses.some(function (guess) { return guess.word === DAILY.answer; });
+        }
+      } catch (error) { storageError = true; }
+
+      function persist() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          saved.stats = gameStats;
+          if (mode === "daily") saved.daily = { date: dateKey, guesses: guesses, finished: finished };
+          localStorage.setItem(storageKey, JSON.stringify(saved));
+          return true;
+        } catch (error) {
+          storageError = true;
+          return false;
+        }
+      }
+      function normalize(value) { return value.normalize("NFC").toLocaleUpperCase("pt-BR").normalize("NFC"); }
+      function isResult(value) { return value === "correct" || value === "present" || value === "absent"; }
+      function wordLength(value) { return Array.from(normalize(value)).length; }
+      function speak(message) {
+        announcer.textContent = "";
+        window.setTimeout(function () { announcer.textContent = message; }, 30);
+      }
+      function makeBoard() {
+        board.replaceChildren();
+        rows.length = 0;
+        for (let r = 0; r < puzzle.maxAttempts; r++) {
+          const row = document.createElement("div");
+          row.className = "guess-row";
+          row.setAttribute("role", "group");
+          row.setAttribute("aria-label", "Tentativa " + (r + 1));
+          const rowCells = [];
+          for (let c = 0; c < puzzle.length; c++) {
+            const cell = document.createElement("div");
+            cell.className = "tile";
+            cell.setAttribute("role", "img");
+            cell.setAttribute("aria-label", "Tentativa " + (r + 1) + ", letra " + (c + 1) + ": vazia");
+            row.appendChild(cell);
+            rowCells.push(cell);
+          }
+          rows.push(rowCells);
+          board.appendChild(row);
+        }
+      }
+      function makeKeyboard() {
+        const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+        keyboard.replaceChildren();
+        layout.forEach(function (letters, index) {
+          const row = document.createElement("div");
+          row.className = "key-row";
+          row.setAttribute("role", "group");
+          row.setAttribute("aria-label", "Linha " + (index + 1) + " do teclado");
+          if (index === 2) addKey(row, "Apagar", "BACKSPACE", true);
+          Array.from(letters).forEach(function (letter) { addKey(row, letter, letter, false); });
+          if (index === 2) addKey(row, "Enviar", "ENTER", true);
+          keyboard.appendChild(row);
+        });
+        const accents = document.createElement("div");
+        accents.className = "key-row accent-row";
+        accents.setAttribute("role", "group");
+        accents.setAttribute("aria-label", "Letras com acento");
+        Array.from("ÁÀÂÃÉÊÍÓÔÕÚÜÇ").forEach(function (letter) { addKey(accents, letter, letter, false); });
+        keyboard.appendChild(accents);
+      }
+      function addKey(row, label, value, wide) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "key" + (wide ? " wide" : "");
+        button.textContent = label;
+        button.setAttribute("aria-label", value === "BACKSPACE" ? "Apagar última letra" : value === "ENTER" ? "Enviar tentativa" : "Digitar " + value);
+        button.dataset.key = value;
+        button.addEventListener("click", function () { handleKey(value); });
+        row.appendChild(button);
+        if (!wide) keyboardButtons.set(value, button);
+      }
+      function render() {
+        const start = guesses.length;
+        board.style.setProperty("--word-length", puzzle.length);
+        for (let r = 0; r < puzzle.maxAttempts; r++) {
+          for (let c = 0; c < puzzle.length; c++) {
+            const el = rows[r][c];
+            el.className = "tile";
+            el.textContent = "";
+            if (r < guesses.length) {
+              const guess = guesses[r];
+              const guessedLetters = Array.from(guess.word);
+              el.textContent = guessedLetters[c];
+              el.classList.add(guess.result[c]);
+              const desc = { correct: "letra certa, no lugar certo", present: "letra presente em outra posição", absent: "letra não aparece na palavra" };
+              el.setAttribute("aria-label", "Tentativa " + (r + 1) + ", letra " + (c + 1) + ": " + guessedLetters[c] + ", " + desc[guess.result[c]]);
+            } else if (r === start && !finished) {
+              const currentLetters = Array.from(current);
+              el.classList.add("current");
+              el.textContent = currentLetters[c] || "";
+              el.setAttribute("aria-label", "Tentativa " + (r + 1) + ", letra " + (c + 1) + ": " + (currentLetters[c] || "vazia"));
+              if (currentLetters[c]) el.classList.add("filled");
+            } else {
+              el.setAttribute("aria-label", "Tentativa " + (r + 1) + ", letra " + (c + 1) + ": vazia");
+            }
+          }
+        }
+        attemptCounter.textContent = guesses.length + " de " + puzzle.maxAttempts;
+        board.setAttribute("aria-label", "Tabuleiro: " + puzzle.maxAttempts + " linhas de " + puzzle.length + " letras. " + guesses.length + " tentativas usadas.");
+        guessLabel.textContent = "Seu palpite (" + puzzle.length + (puzzle.length === 1 ? " letra)" : " letras)");
+        guessInput.maxLength = puzzle.length;
+        guessInput.disabled = finished;
+        guessInput.value = current;
+        document.getElementById("modePill").textContent = mode === "daily" ? "DO DIA" : "TREINO";
+        document.getElementById("challengeTitle").textContent = mode === "daily" ? "Desafio diário" : "Treino";
+        document.getElementById("categoryLabel").textContent = puzzle.category;
+        document.getElementById("themeLabel").textContent = puzzle.theme;
+        keyboardButtons.forEach(function (button, letter) {
+          button.classList.remove("key-correct", "key-present", "key-absent");
+          const priority = { absent: 1, present: 2, correct: 3 };
+          let best = "";
+          guesses.forEach(function (guess) {
+            Array.from(guess.word).forEach(function (guessLetter, idx) {
+              if (guessLetter === letter && (!best || priority[guess.result[idx]] > priority[best])) best = guess.result[idx];
+            });
+          });
+          if (best) {
+            button.classList.add("key-" + best);
+            button.setAttribute("aria-label", "Digitar " + letter + "; " + ({ correct: "letra certa no lugar certo", present: "letra presente em outra posição", absent: "letra ausente" }[best]));
+          } else {
+            button.setAttribute("aria-label", "Digitar " + letter);
+          }
+        });
+      }
+      function evaluate(word, answer) {
+        const letters = Array.from(word);
+        const answerLetters = Array.from(answer);
+        const result = Array(answerLetters.length).fill("absent");
+        const remaining = {};
+        for (let i = 0; i < answerLetters.length; i++) {
+          if (letters[i] === answerLetters[i]) result[i] = "correct";
+          else remaining[answerLetters[i]] = (remaining[answerLetters[i]] || 0) + 1;
+        }
+        for (let i = 0; i < answerLetters.length; i++) {
+          if (result[i] === "correct") continue;
+          if (remaining[letters[i]] > 0) {
+            result[i] = "present";
+            remaining[letters[i]]--;
+          }
+        }
+        return result;
+      }
+      function handleKey(key) {
+        if (finished) { speak("Esta rodada já terminou. Escolha um treino ou volte amanhã."); return; }
+        if (key === "BACKSPACE") {
+          current = Array.from(current).slice(0, -1).join("");
+          render();
+          return;
+        }
+        if (key === "ENTER") {
+          if (wordLength(current) !== puzzle.length) {
+            status.textContent = "Sua palavra precisa ter " + puzzle.length + " letras.";
+            speak("Palavra incompleta. Digite " + puzzle.length + " letras antes de enviar. Nenhuma tentativa foi consumida.");
+            return;
+          }
+          if (!DEMO_WORDS.includes(normalize(current))) {
+            status.textContent = "Essa palavra não faz parte do vocabulário demonstrativo offline. Tente outra palavra; nenhuma tentativa foi consumida.";
+            speak(status.textContent);
+            return;
+          }
+          submitGuess();
+          return;
+        }
+        const letter = normalize(key);
+        if (/^\p{L}$/u.test(letter) && wordLength(current) < puzzle.length) {
+          current = normalize(current + letter);
+          render();
+        }
+      }
+      guessInput.addEventListener("input", function () {
+        current = Array.from(normalize(guessInput.value)).filter(function (letter) {
+          return /^\p{L}$/u.test(letter);
+        }).slice(0, puzzle.length).join("");
+        render();
+      });
+      guessForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        handleKey("ENTER");
+      });
+      function submitGuess() {
+        const word = normalize(current);
+        const result = evaluate(word, puzzle.answer);
+        guesses.push({ word: word, result: result });
+        current = "";
+        const hit = word === puzzle.answer;
+        const end = hit || guesses.length === puzzle.maxAttempts;
+        if (end) {
+          finished = true;
+          if (mode === "daily") {
+            gameStats.played++;
+            if (hit) {
+              gameStats.won++;
+              const yesterday = new Date(today);
+              yesterday.setDate(yesterday.getDate() - 1);
+              const yesterdayKey = [yesterday.getFullYear(), String(yesterday.getMonth() + 1).padStart(2, "0"), String(yesterday.getDate()).padStart(2, "0")].join("-");
+              gameStats.streak = gameStats.lastDate === yesterdayKey ? gameStats.streak + 1 : 1;
+              gameStats.lastDate = dateKey;
+            } else {
+              gameStats.streak = 0;
+            }
+            updateStats();
+          }
+        }
+        const saved = mode !== "daily" || persist();
+        render();
+        const wordLetters = Array.from(word);
+        const descriptions = result.map(function (item, i) {
+          const text = item === "correct" ? "certa no lugar certo" : item === "present" ? "presente em outra posição" : "não está na palavra";
+          return wordLetters[i] + ": " + text;
+        }).join("; ");
+        let message = "Tentativa " + guesses.length + " de " + puzzle.maxAttempts + ". " + descriptions + ".";
+        if (hit) message += " Você acertou em " + guesses.length + (guesses.length === 1 ? " tentativa!" : " tentativas!");
+        else if (end) message += " Fim de jogo. A palavra era " + puzzle.answer + ".";
+        else message += " Continue tentando.";
+        if (!saved) message += " Atenção: não foi possível salvar o progresso; a rodada continua, mas pode não ser mantida.";
+        status.textContent = hit ? "Acertou! " + message : end ? "Rodada encerrada. " + message : "Pista registrada. " + message;
+        speak(message);
+      }
+      function updateStats() {
+        document.getElementById("playedStat").textContent = gameStats.played;
+        document.getElementById("winStat").textContent = gameStats.played ? Math.round(gameStats.won / gameStats.played * 100) + "%" : "0%";
+        document.getElementById("streakStat").textContent = gameStats.streak;
+        document.getElementById("streakMessage").textContent = gameStats.streak ? "Você está há " + gameStats.streak + (gameStats.streak === 1 ? " dia" : " dias") + " na sequência!" : "Cada dia é uma nova chance de manter a sequência.";
+      }
+      function switchMode(nextMode, selected) {
+        mode = nextMode;
+        if (mode === "daily") {
+          puzzle = Object.assign({}, DAILY, { length: 5, maxAttempts: LIMITS.daily });
+          guesses = [];
+          current = "";
+          finished = false;
+          try {
+            const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+            if (saved.daily && saved.daily.date === dateKey) {
+              const restored = Array.isArray(saved.daily.guesses) ? saved.daily.guesses : [];
+              guesses = restored.filter(function (guess) {
+                return guess && typeof guess.word === "string" && wordLength(guess.word) === puzzle.length &&
+                  Array.isArray(guess.result) && guess.result.length === puzzle.length && guess.result.every(isResult);
+              }).slice(0, puzzle.maxAttempts).map(function (guess) { return { word: normalize(guess.word), result: guess.result.slice() }; });
+              finished = Boolean(saved.daily.finished) || guesses.length >= puzzle.maxAttempts || guesses.some(function (guess) { return guess.word === puzzle.answer; });
+            }
+          } catch (error) {
+            storageError = true;
+            status.textContent = "Não foi possível carregar o progresso salvo. O desafio começa sem os dados anteriores.";
+            speak(status.textContent);
+          }
+        } else {
+          trainingLevel = TRAINING[selected] ? selected : "facil";
+          const training = TRAINING[trainingLevel];
+          const answer = training.answers ? training.answers[Math.floor(Math.random() * training.answers.length)] : training.answer;
+          puzzle = Object.assign({}, training, { answer: answer, length: Array.from(answer).length, maxAttempts: LIMITS[trainingLevel] });
+          guesses = [];
+          current = "";
+          finished = false;
+        }
+        makeBoard();
+        if (!storageError) status.textContent = mode === "daily" ? "Desafio diário carregado." : "Treino " + trainingLevel + " iniciado. Boa prática!";
+        render();
+        if (storageError) {
+          status.textContent = "Não foi possível acessar ou salvar o progresso neste navegador. A rodada continua disponível, mas pode não ser mantida.";
+        }
+        speak(status.textContent);
+      }
+      async function share() {
+        const summary = "Palavra de Feira " + (mode === "daily" ? dateKey : "treino " + trainingLevel) + "\n" +
+          (finished ? (guesses.some(function (g) { return g.word === puzzle.answer; }) ? guesses.length + "/" + puzzle.maxAttempts : "X/" + puzzle.maxAttempts) : guesses.length + "/" + puzzle.maxAttempts) +
+          "\n" + guesses.map(function (g) {
+            return g.result.map(function (x) { return x === "correct" ? "🟩" : x === "present" ? "🟨" : "⬛"; }).join("");
+          }).join("\n") + "\nJogue você também!";
+        try {
+          await navigator.clipboard.writeText(summary);
+          status.textContent = "Resultado copiado para compartilhar, sem revelar a palavra.";
+          speak(status.textContent);
+        } catch (_) {
+          const area = document.createElement("textarea");
+          area.value = summary;
+          area.setAttribute("aria-label", "Resultado sem spoiler para copiar");
+          area.style.position = "fixed";
+          area.style.opacity = "0";
+          document.body.appendChild(area);
+          area.select();
+          let copied = false;
+          try { copied = document.execCommand("copy"); } catch (error) { copied = false; }
+          area.remove();
+          status.textContent = copied ? "Resultado copiado para compartilhar, sem revelar a palavra." : "Não foi possível copiar automaticamente. Seu resultado sem spoiler: " + guesses.length + " de " + puzzle.maxAttempts + " tentativas.";
+          speak(status.textContent);
+        }
+      }
+      document.getElementById("shareButton").addEventListener("click", share);
+      document.getElementById("shareTop").addEventListener("click", share);
+      document.getElementById("newDailyButton").addEventListener("click", function () {
+        switchMode("daily");
+      });
+      const dialog = document.getElementById("infoDialog");
+      document.getElementById("helpOpen").addEventListener("click", function () { dialog.showModal(); });
+      document.getElementById("dialogClose").addEventListener("click", function () { dialog.close(); });
+      document.getElementById("archiveButton").addEventListener("click", function () {
+        document.getElementById("dialogTitle").textContent = "Arquivo da banca";
+        document.getElementById("dialogBody").textContent = "O arquivo premium é uma prévia neste protótipo. Aqui você poderá revisitar desafios passados e explorar novas categorias. Nenhuma compra ou cadastro é realizado.";
+        dialog.showModal();
+      });
+      dialog.addEventListener("close", function () {
+        document.getElementById("dialogTitle").textContent = "Como jogar";
+        document.getElementById("dialogBody").textContent = "No desafio diário, adivinhe a palavra de cinco letras em até seis tentativas. No treino, escolha Fácil (4 ou 5 letras, 8 palpites), Médio (5 letras, 6 palpites) ou Difícil (6 ou 7 letras, 5 palpites). Acentos fazem diferença; maiúsculas e minúsculas não. Cada letra recebe uma pista textual e visual: certa no lugar certo, presente em outra posição ou ausente.";
+      });
+      document.getElementById("trainingSelect").addEventListener("change", function (event) { switchMode("training", event.target.value); });
+      document.getElementById("restartTrainingButton").addEventListener("click", function () {
+        switchMode("training", document.getElementById("trainingSelect").value);
+      });
+      puzzle = Object.assign({}, DAILY, { length: 5, maxAttempts: LIMITS.daily });
+      makeBoard();
+      makeKeyboard();
+      updateStats();
+      render();
+      if (finished) {
+        const won = guesses.some(function (g) { return g.word === DAILY.answer; });
+        status.textContent = won ? "Você já acertou o desafio de hoje. Volte amanhã para uma nova palavra." : "Você já completou o desafio de hoje. A palavra era " + DAILY.answer + ".";
+      }
+      if (storageError) {
+        status.textContent = "Não foi possível carregar ou gravar o progresso salvo. O jogo segue disponível, mas o avanço pode não ser persistido.";
+        speak(status.textContent);
+      }
+    }());
+  </script>
+</body>
+</html>

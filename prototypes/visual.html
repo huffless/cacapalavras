@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171522">
+  <title>Palavra do dia — entrelinhas</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #121820;
+      --ink-soft: #19232c;
+      --panel: #202c35;
+      --panel-light: #2b3942;
+      --paper: #f4f0e5;
+      --muted: #c0c5c2;
+      --muted-dark: #969f9d;
+      --lime: #d8ed78;
+      --lime-dark: #b8ce59;
+      --coral: #ff9a7b;
+      --line: rgba(244, 240, 229, .15);
+      --teal: #8bd6c1;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: "Aptos", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--ink); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--paper);
+      background:
+        radial-gradient(ellipse at 78% 7%, rgba(73, 119, 117, .18), transparent 36rem),
+        radial-gradient(ellipse at 5% 80%, rgba(194, 133, 98, .10), transparent 31rem),
+        linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px),
+        var(--ink);
+      background-size: auto, auto, 36px 36px, 36px 36px, auto;
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { color: inherit; font: inherit; }
+    button:focus-visible {
+      outline: 3px solid var(--lime);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 6px rgba(18, 24, 32, .9);
+    }
+    button:disabled { cursor: not-allowed; opacity: .56; }
+    .shell { width: min(1160px, calc(100% - 64px)); margin: 0 auto; }
+    .topbar {
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: var(--paper);
+      text-decoration: none;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px 12px 12px 4px;
+      color: var(--ink);
+      background: var(--lime);
+      font-family: var(--serif);
+      font-size: 23px;
+      font-weight: 700;
+      transform: rotate(-4deg);
+      box-shadow: 0 5px 18px rgba(216, 237, 120, .16);
+    }
+    .brand-name { font-size: 16px; font-weight: 700; letter-spacing: .035em; }
+    .brand-name span { color: var(--lime); }
+    .nav { display: flex; align-items: center; gap: 8px; }
+    .nav-link, .icon-button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .2s, background .2s, transform .2s;
+    }
+    .nav-link { padding: 12px 15px; font-size: 13px; }
+    .nav-link:hover, .nav-link.active { color: var(--paper); }
+    .nav-link.active { position: relative; }
+    .nav-link.active::after {
+      position: absolute;
+      right: 15px;
+      bottom: -17px;
+      left: 15px;
+      height: 2px;
+      content: "";
+      background: var(--lime);
+      border-radius: 5px;
+    }
+    .nav-link .lock { margin-left: 4px; color: var(--lime); font-size: 10px; }
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      margin-left: 10px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+    .icon-button:hover { color: var(--lime); border-color: rgba(216, 237, 120, .45); transform: rotate(12deg); }
+
+    main { padding: 48px 0 72px; }
+    .intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 12px;
+      color: var(--lime);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { width: 18px; height: 1px; content: ""; background: var(--lime); }
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(42px, 5.2vw, 64px);
+      font-weight: 400;
+      letter-spacing: -.055em;
+      line-height: .99;
+    }
+    h1 em { color: var(--lime); font-weight: 400; }
+    .edition {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .045em;
+      white-space: nowrap;
+    }
+    .edition strong { color: var(--paper); font-weight: 600; }
+    .edition-mark { width: 6px; height: 6px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 11px var(--coral); }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .8fr); gap: 22px; align-items: stretch; }
+    .game-card, .side-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(35, 48, 57, .97), rgba(25, 35, 44, .98));
+      box-shadow: 0 24px 65px rgba(0, 0, 0, .24);
+    }
+    .game-card { padding: 28px 32px 24px; }
+    .game-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .category {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+    .category-icon { color: var(--lime); font-size: 14px; }
+    .challenge-number {
+      padding: 5px 9px;
+      border: 1px solid rgba(216, 237, 120, .24);
+      border-radius: 20px;
+      color: var(--lime);
+      background: rgba(216, 237, 120, .08);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+    }
+    .hint {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin: 20px 0 20px;
+      padding: 15px 17px;
+      border-left: 2px solid var(--coral);
+      border-radius: 0 7px 7px 0;
+      background: linear-gradient(90deg, rgba(255, 154, 123, .095), rgba(255, 154, 123, .025));
+      color: #f0e8db;
+      font-family: var(--serif);
+      font-size: 16px;
+      font-style: italic;
+    }
+    .hint-label {
+      flex: 0 0 auto;
+      color: var(--coral);
+      font-family: var(--sans);
+      font-size: 10px;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .board {
+      display: grid;
+      width: min(100%, var(--board-width, 300px));
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto 20px;
+    }
+    .board-row {
+      display: grid;
+      grid-template-columns: repeat(var(--word-length, 5), minmax(0, 1fr));
+      gap: 8px;
+    }
+    .tile {
+      position: relative;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(244, 240, 229, .28);
+      border-radius: 9px;
+      color: var(--paper);
+      background: rgba(10, 16, 22, .46);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .035em;
+      transition: transform .16s, border-color .16s, background .16s;
+    }
+    .tile.filled { border-color: rgba(245, 240, 223, .48); animation: pop .15s ease-out; }
+    .tile.correct { border: 2px solid #d8ed78; background: #43592f; }
+    .tile.present { border: 2px dashed #ffbd82; background: #68452f; }
+    .tile.absent { border: 2px dotted #c0c5c2; background: #303941; color: #f0eee7; }
+    .tile.correct::after, .tile.present::after, .tile.absent::after {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: 9px;
+      line-height: 1;
+    }
+    .tile.correct::after { content: "✓"; }
+    .tile.present::after { content: "↗"; }
+    .tile.absent::after { content: "×"; }
+    .tile.active { border-color: var(--lime); box-shadow: 0 0 0 2px rgba(216, 237, 120, .15), 0 0 18px rgba(216, 237, 120, .12); }
+    .tile.shake { animation: shake .28s ease-in-out; }
+    @keyframes pop { 50% { transform: scale(1.08); } }
+    @keyframes shake { 25%, 75% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    .legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 18px; margin: 0 0 20px; color: var(--muted); font-size: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 9px; height: 9px; border-radius: 3px; }
+    .legend-swatch.correct { color: #d8ed78; background: #43592f; }
+    .legend-swatch.present { color: #ffbd82; background: #68452f; }
+    .legend-swatch.absent { color: #f0eee7; background: #303941; }
+    .legend-swatch::after { display: block; text-align: center; font-size: 8px; font-style: normal; font-weight: 700; line-height: 9px; }
+    .legend-swatch.correct::after { content: "✓"; }
+    .legend-swatch.present::after { content: "↗"; }
+    .legend-swatch.absent::after { content: "×"; }
+    .keyboard { display: grid; gap: 6px; max-width: 440px; margin: 0 auto; }
+    .key-row { display: flex; justify-content: center; gap: 5px; }
+    .key-row .key { min-width: 0; flex: 1 1 0; padding-right: 2px; padding-left: 2px; }
+    .key-row .key.wide { flex-grow: 1.6; }
+    .accent-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
+    .key {
+      min-width: 29px;
+      height: 39px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 5px;
+      color: var(--paper);
+      background: #40515a;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: transform .1s, background .16s, color .16s;
+      user-select: none;
+    }
+    .key:hover { background: #566b73; transform: translateY(-2px); }
+    .key:active { transform: scale(.94); }
+    .key.wide { min-width: 57px; color: var(--lime); font-size: 10px; }
+    .key.correct { color: #f8ffe3; background: #526d35; }
+    .key.present { color: #fff1df; background: #805739; }
+    .key.absent { color: #d4d8d5; background: #303941; }
+    .key.correct::after, .key.present::after, .key.absent::after { margin-left: 3px; font-size: 9px; }
+    .key.correct::after { content: "✓"; }
+    .key.present::after { content: "↗"; }
+    .key.absent::after { content: "×"; }
+    .key.accent { min-width: 29px; color: var(--lime); background: #34454a; }
+    .game-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .tries strong { color: var(--paper); font-weight: 600; }
+    .share-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border: 1px solid rgba(216, 237, 120, .42);
+      border-radius: 7px;
+      color: var(--lime);
+      background: rgba(216, 237, 120, .07);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      transition: background .2s, transform .2s;
+    }
+    .share-button:hover:not(:disabled) { background: rgba(216, 237, 120, .15); transform: translateY(-1px); }
+
+    .result-panel {
+      margin: 0 0 18px;
+      padding: 15px 17px;
+      border: 1px solid rgba(139, 214, 193, .3);
+      border-radius: 10px;
+      background: linear-gradient(100deg, rgba(139, 214, 193, .11), rgba(139, 214, 193, .035));
+    }
+    .result-panel[hidden] { display: none; }
+    .result-kicker { margin: 0 0 5px; color: var(--teal); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .result-title { margin: 0; font-family: var(--serif); font-size: 20px; font-weight: 400; }
+    .result-detail { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+    .side-card { display: flex; flex-direction: column; padding: 27px 25px 22px; }
+    .side-title-row { display: flex; align-items: center; justify-content: space-between; }
+    .side-title {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--coral);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .streak-number {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      margin: 17px 0 3px;
+      color: var(--paper);
+      font-family: var(--serif);
+      font-size: 51px;
+      letter-spacing: -.065em;
+      line-height: 1;
+    }
+    .streak-number span { color: var(--coral); font-family: var(--sans); font-size: 21px; }
+    .streak-number #streakValue { color: var(--paper); font-family: var(--serif); font-size: 51px; }
+    .streak-caption { margin: 4px 0 20px; color: var(--muted); font-size: 11px; }
+    .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 23px; }
+    .day { display: flex; flex-direction: column; align-items: center; gap: 7px; color: var(--muted-dark); font-size: 9px; }
+    .day-dot {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .day.done .day-dot { border-color: transparent; color: var(--ink); background: var(--lime); }
+    .day.today { color: var(--lime); }
+    .day.today .day-dot { border-color: var(--lime); color: var(--lime); box-shadow: 0 0 12px rgba(216, 237, 120, .12); }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .stat { text-align: center; }
+    .stat + .stat { border-left: 1px solid var(--line); }
+    .stat strong { display: block; margin-bottom: 4px; font-family: var(--serif); font-size: 23px; font-weight: 400; }
+    .stat span { color: var(--muted); font-size: 10px; }
+    .history { margin-top: 18px; }
+    .history-head { display: flex; justify-content: space-between; margin-bottom: 9px; color: var(--muted); font-size: 10px; }
+    .history-head strong { color: var(--paper); font-weight: 500; }
+    .bars { display: grid; gap: 5px; }
+    .bar-row { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; }
+    .bar {
+      min-width: 18px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      padding-right: 5px;
+      border-radius: 2px;
+      color: var(--ink);
+      background: #aeb6b1;
+      font-size: 9px;
+      font-weight: 700;
+      transition: width .5s ease;
+    }
+    .bar.current { background: var(--lime); }
+    .side-bottom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+      padding: 14px 13px;
+      border: 1px solid rgba(216, 237, 120, .17);
+      border-radius: 8px;
+      background: rgba(216, 237, 120, .05);
+    }
+    .side-bottom-icon { width: 33px; height: 33px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 50%; color: var(--lime); background: rgba(216, 237, 120, .12); font-size: 15px; }
+    .side-bottom-copy { min-width: 0; }
+    .side-bottom-copy strong { display: block; margin-bottom: 3px; font-family: var(--serif); font-size: 13px; font-weight: 400; }
+    .side-bottom-copy span { color: var(--muted); font-size: 10px; }
+    .side-bottom button { flex: 0 0 auto; margin-left: auto; padding: 8px 10px; border: 0; border-radius: 5px; color: var(--ink); background: var(--lime); cursor: pointer; font-size: 10px; font-weight: 700; transition: filter .2s; }
+    .side-bottom button:hover { filter: brightness(1.1); }
+    .practice-note {
+      margin: 14px 0 0;
+      padding: 10px 12px;
+      border-left: 2px solid var(--teal);
+      color: var(--muted);
+      background: rgba(139, 214, 193, .06);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+    .practice-note[hidden] { display: none; }
+    .practice-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0 0 18px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(10, 16, 22, .34);
+    }
+    .practice-panel[hidden] { display: none; }
+    .practice-panel p { margin: 0; color: var(--muted); font-size: 11px; }
+    .practice-levels { display: flex; flex-wrap: wrap; gap: 8px; }
+    .level-button {
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--paper);
+      background: var(--panel-light);
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .level-button:hover, .level-button[aria-pressed="true"] { border-color: var(--lime); background: #35464a; }
+    .level-button span { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .toast {
+      position: fixed;
+      z-index: 5;
+      right: 24px;
+      bottom: 24px;
+      padding: 12px 17px;
+      border: 1px solid rgba(216, 237, 120, .3);
+      border-radius: 8px;
+      color: var(--paper);
+      background: #26353e;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, .28);
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(9px);
+      transition: opacity .2s, transform .2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+    @media (min-width: 900px) {
+      .side-card { min-height: 620px; }
+    }
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); gap: 14px; }
+      .game-card { padding: 22px 19px 18px; }
+      .side-card { padding: 21px 17px 17px; }
+      .tile { height: auto; }
+      .nav-link { padding-right: 9px; padding-left: 9px; }
+    }
+    @media (max-width: 660px) {
+      .shell { width: min(100% - 32px, 480px); }
+      .topbar { height: 70px; }
+      .brand { gap: 9px; }
+      .brand-mark { width: 31px; height: 31px; }
+      .nav { gap: 2px; }
+      .nav-link { padding: 8px 7px; font-size: 11px; }
+      .nav-link.active::after { right: 7px; bottom: -15px; left: 7px; }
+      .nav-link .lock { margin-left: 1px; font-size: 8px; }
+      .icon-button { width: 32px; height: 32px; margin-left: 3px; }
+      main { padding: 29px 0 42px; }
+      .intro { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+      .eyebrow { margin-bottom: 9px; font-size: 9px; }
+      h1 { font-size: clamp(37px, 10vw, 48px); }
+      .edition { align-self: flex-start; gap: 6px; padding: 8px; font-size: 9px; }
+      .layout { grid-template-columns: 1fr; gap: 13px; }
+      .game-card { padding: 19px 14px 16px; }
+      .side-card { min-height: 0; padding: 19px 17px 16px; }
+      .side-bottom { margin-top: 17px; }
+      .result-title { font-size: 18px; }
+    }
+    @media (max-width: 390px) {
+      .shell { width: calc(100% - 24px); }
+      .brand-name { font-size: 14px; }
+      .nav-link { padding-right: 5px; padding-left: 5px; font-size: 10px; }
+      .icon-button { width: 29px; height: 29px; }
+      .edition { max-width: 125px; white-space: normal; line-height: 1.3; }
+      .tile { height: auto; }
+      .board { gap: 6px; }
+      .key { min-width: 25px; height: 37px; padding: 0 6px; font-size: 11px; }
+      .key.wide { min-width: 48px; }
+      .key-row { gap: 4px; }
+      .accent-row { gap: 4px; }
+      .key.accent { min-width: 25px; height: 34px; padding: 0 6px; }
+      .game-foot { align-items: stretch; flex-direction: column; }
+      .share-button { width: 100%; }
+      .hint { align-items: flex-start; gap: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="entrelinhas, início">
+        <span class="brand-mark" aria-hidden="true">e</span>
+        <span class="brand-name">entre<span>linhas</span></span>
+      </a>
+      <nav class="nav" aria-label="Modos de jogo">
+        <button class="nav-link active" type="button" id="challengeLink" aria-pressed="true">Desafio</button>
+        <button class="nav-link" type="button" id="practiceLink" aria-pressed="false">Treino</button>
+        <button class="nav-link" type="button" id="archiveLink">Arquivo<span class="lock" aria-label="premium">✳</span></button>
+        <button class="icon-button" type="button" aria-label="Como jogar" id="helpButton">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M9.7 9a2.35 2.35 0 1 1 3.86 1.8c-.87.73-1.56 1.17-1.56 2.45M12 16.8v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="pageTitle">
+        <div>
+          <p class="eyebrow" id="eyebrow">Um desafio, todo dia</p>
+          <h1 id="pageTitle">Palavra <em>do dia.</em></h1>
+        </div>
+        <div class="edition"><span class="edition-mark"></span><strong id="editionDate"></strong><span>·</span><span id="editionNumber"></span></div>
+      </section>
+
+      <div class="layout">
+        <section class="game-card" aria-label="Desafio diário de palavras">
+          <div class="game-head">
+            <div class="category"><span class="category-icon" aria-hidden="true">✳</span> <span id="categoryText">Categoria: céu e navegação</span></div>
+            <span class="challenge-number" id="challengeNumber">#293</span>
+          </div>
+            <div class="hint"><span class="hint-label">Pista</span><span id="hintText">Ajuda a encontrar o caminho quando a noite chega.</span></div>
+            <p class="sr-only" id="accentNote">Acentos fazem diferença: Á e A, por exemplo, são letras distintas.</p>
+
+            <section class="practice-panel" id="practicePanel" aria-label="Escolha o nível de treino" hidden>
+              <p>Escolha um nível para começar. O treino não altera o progresso diário.</p>
+              <div class="practice-levels">
+                <button class="level-button" type="button" data-level="easy" aria-pressed="false">Fácil<span>4–5 letras · 8 palpites</span></button>
+                <button class="level-button" type="button" data-level="medium" aria-pressed="false">Médio<span>5 letras · 6 palpites</span></button>
+                <button class="level-button" type="button" data-level="hard" aria-pressed="false">Difícil<span>6–7 letras · 5 palpites</span></button>
+              </div>
+            </section>
+
+          <div class="board" id="board" role="grid" aria-label="Tabuleiro com seis tentativas e cinco letras"></div>
+          <div class="legend" aria-label="Legenda">
+            <span class="legend-item"><i class="legend-swatch correct" aria-hidden="true"></i>na posição certa (✓)</span>
+            <span class="legend-item"><i class="legend-swatch present" aria-hidden="true"></i>na palavra, em outra posição (↗)</span>
+            <span class="legend-item"><i class="legend-swatch absent" aria-hidden="true"></i>não aparece (×)</span>
+          </div>
+          <section class="result-panel" id="resultPanel" aria-live="polite" hidden>
+            <p class="result-kicker" id="resultKicker">Rodada concluída</p>
+            <h2 class="result-title" id="resultTitle"></h2>
+            <p class="result-detail" id="resultDetail"></p>
+          </section>
+
+          <div class="keyboard" id="keyboard" aria-label="Teclado de letras" aria-describedby="accentNote">
+            <div class="key-row">
+              <button class="key" data-letter="Q">Q</button><button class="key" data-letter="W">W</button><button class="key" data-letter="E">E</button><button class="key" data-letter="R">R</button><button class="key" data-letter="T">T</button><button class="key" data-letter="Y">Y</button><button class="key" data-letter="U">U</button><button class="key" data-letter="I">I</button><button class="key" data-letter="O">O</button><button class="key" data-letter="P">P</button>
+            </div>
+            <div class="key-row">
+              <button class="key" data-letter="A">A</button><button class="key" data-letter="S">S</button><button class="key" data-letter="D">D</button><button class="key" data-letter="F">F</button><button class="key" data-letter="G">G</button><button class="key" data-letter="H">H</button><button class="key" data-letter="J">J</button><button class="key" data-letter="K">K</button><button class="key" data-letter="L">L</button>
+            </div>
+            <div class="key-row">
+              <button class="key wide" type="button" data-action="enter">ENTER</button><button class="key" type="button" data-letter="Z">Z</button><button class="key" type="button" data-letter="X">X</button><button class="key" type="button" data-letter="C">C</button><button class="key" type="button" data-letter="V">V</button><button class="key" type="button" data-letter="B">B</button><button class="key" type="button" data-letter="N">N</button><button class="key" type="button" data-letter="M">M</button><button class="key wide" type="button" data-action="delete" aria-label="Apagar última letra">⌫</button>
+            </div>
+            <div class="accent-row" aria-label="Letras com acento">
+              <button class="key accent" data-letter="Á">Á</button><button class="key accent" data-letter="Ã">Ã</button><button class="key accent" data-letter="Â">Â</button><button class="key accent" data-letter="À">À</button><button class="key accent" data-letter="É">É</button><button class="key accent" data-letter="Ê">Ê</button><button class="key accent" data-letter="Í">Í</button><button class="key accent" data-letter="Ó">Ó</button><button class="key accent" data-letter="Ô">Ô</button><button class="key accent" data-letter="Õ">Õ</button><button class="key accent" data-letter="Ú">Ú</button><button class="key accent" data-letter="Ç">Ç</button>
+            </div>
+          </div>
+
+          <div class="game-foot">
+            <span class="tries" id="tries"><strong>0 de 6</strong> tentativas usadas</span>
+            <button class="share-button" type="button" id="shareButton" disabled aria-describedby="shareNote">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Compartilhar
+            </button>
+          </div>
+          <p class="sr-only" id="shareNote">Compartilhamento mostra somente os símbolos de cada tentativa, nunca a resposta.</p>
+          <p class="sr-only" id="liveRegion" aria-live="polite"></p>
+        </section>
+
+        <aside class="side-card" aria-label="Estatísticas do desafio diário">
+          <div class="side-title-row">
+            <h2 class="side-title">Seu ritmo</h2>
+            <span class="streak-badge"><span aria-hidden="true">✦</span> em sequência</span>
+          </div>
+          <div class="streak-number"><span id="streakValue">0</span> <span>dias</span></div>
+          <p class="streak-caption" id="streakCaption">Sua sequência aparece depois do primeiro desafio.</p>
+
+          <div class="week" id="weekActivity" aria-label="Atividade dos últimos sete dias"></div>
+
+          <div class="stats">
+            <div class="stat"><strong id="winRate">0%</strong><span>vitórias</span></div>
+            <div class="stat"><strong id="gamesPlayed">0</strong><span>jogos</span></div>
+            <div class="stat"><strong id="averageAttempts">—</strong><span>média</span></div>
+          </div>
+
+          <div class="history">
+            <div class="history-head"><strong>Palavras encontradas</strong><span>últimos jogos</span></div>
+            <div class="bars" aria-label="Distribuição das vitórias por tentativa">
+              <div class="bar-row">1 <span class="bar" data-attempt="1">0</span></div>
+              <div class="bar-row">2 <span class="bar" data-attempt="2">0</span></div>
+              <div class="bar-row">3 <span class="bar" data-attempt="3">0</span></div>
+              <div class="bar-row">4 <span class="bar" data-attempt="4">0</span></div>
+              <div class="bar-row">5 <span class="bar" data-attempt="5">0</span></div>
+              <div class="bar-row">6 <span class="bar" data-attempt="6">0</span></div>
+            </div>
+            <p class="practice-note" id="practiceNote" hidden>Rodadas de treino são ilimitadas e não alteram sua sequência nem as estatísticas do desafio diário.</p>
+          </div>
+
+          <div class="side-bottom">
+            <div class="side-bottom-icon" aria-hidden="true">✳</div>
+            <div class="side-bottom-copy"><strong>Tem mais palavras por aí.</strong><span>Treine no seu ritmo, sem limite.</span></div>
+            <button type="button" id="practiceButton">Jogar</button>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const localDay = new Date();
+      const dateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      const todayKey = dateKey(localDay);
+      const dayOfYear = Math.floor((Date.UTC(localDay.getFullYear(), localDay.getMonth(), localDay.getDate()) - Date.UTC(localDay.getFullYear(), 0, 0)) / 86400000);
+      const dailyScheduleStart = Date.UTC(2026, 9, 20) / 86400000;
+      const todaySerial = Date.UTC(localDay.getFullYear(), localDay.getMonth(), localDay.getDate()) / 86400000;
+      const dailyChallenges = [
+        { answer: "FAROL", theme: "céu e navegação", hint: "Ajuda a encontrar o caminho quando a noite chega." },
+        { answer: "MANGA", theme: "frutas", hint: "Fruta tropical de polpa doce e caroço grande." },
+        { answer: "PRAIA", theme: "lugares", hint: "Faixa de areia ou pedras junto ao mar." },
+        { answer: "LIVRO", theme: "cultura", hint: "Reúne páginas para ler uma história ou aprender." },
+        { answer: "CHUVA", theme: "clima", hint: "Cai das nuvens e molha a cidade." },
+        { answer: "NOITE", theme: "tempo", hint: "Período escuro entre o pôr e o nascer do sol." },
+        { answer: "VENTO", theme: "natureza", hint: "Movimento do ar que balança as folhas." },
+        { answer: "BARCO", theme: "navegação", hint: "Veículo que se desloca sobre a água." },
+        { answer: "CAMPO", theme: "lugares", hint: "Área aberta de cultivo ou pastagem." },
+        { answer: "FOLHA", theme: "natureza", hint: "Parte verde que nasce nos galhos das plantas." },
+        { answer: "SONHO", theme: "imaginação", hint: "História que a mente cria durante o sono." },
+        { answer: "TEMPO", theme: "cotidiano", hint: "Pode passar depressa ou mudar com o clima." }
+      ];
+      const dailyOffset = ((todaySerial - dailyScheduleStart) % dailyChallenges.length + dailyChallenges.length) % dailyChallenges.length;
+      const dailyChallenge = dailyChallenges[dailyOffset];
+      const acceptedWords = new Set((
+        "ABACAXI AMIGOS AMOR ÁRVORE BARCO BOLA BOLSA BRISA CAMPO CANTO CARRO CARTA CASA CHAVE CHUVA CINCO COISA COMER CORPO CORES DADO DOCE ESTRELA FAROL FELIZ FESTA FLOR FOLHA FRUTA GATO GENTE GRATO HOMEM JANELA JOGAR JOGOS LAPIS LÁPIS LEITE LENTO LIVRO LINDO LINDA LUGAR MACA MAÇÃ MAÇÃS MAÇAS MANGA MÃE MÃES MESA MUNDO MATO NOITE NUVEM OLHAR OLHOS ONTEM PAPEL PAREDE PATO PEDRA PEIXE PIANO PONTO PORTA PRATO PRAIA QUASE QUATRO RAIVA RÁDIO RASGO SABER SABOR SAÚDE SONHO TEMPO TERÇO TIGRE TOMAR VENTO VERDE VIDA VIVER VOLTA ÁGUA ÁRVORE FLORES LIMÃO LIMÕES PÊSSEGO XÍCARA"
+      ).normalize("NFC").toLocaleUpperCase("pt-BR").split(/\s+/));
+      const modes = {
+        daily: {
+          label: "Desafio diário",
+          ...dailyChallenge,
+          level: "Médio",
+          attempts: 6,
+          minLetters: 5,
+          maxLetters: 5
+        },
+        easy: {
+          label: "Treino · Fácil",
+          rounds: [
+            { answer: "FLOR", theme: "jardim", hint: "Tem pétalas, pode perfumar o jardim e costuma ganhar um vaso." },
+            { answer: "CASA", theme: "moradia", hint: "Lugar onde as pessoas vivem e descansam." },
+            { answer: "GATO", theme: "animais", hint: "Felino doméstico que costuma ronronar." },
+            { answer: "PATO", theme: "animais", hint: "Ave que nada e tem o bico achatado." },
+            { answer: "DOCE", theme: "sabores", hint: "Pode ser uma sobremesa feita com açúcar." },
+            { answer: "VIDA", theme: "cotidiano", hint: "É o que temos e cuidamos todos os dias." },
+            { answer: "AMOR", theme: "sentimentos", hint: "Sentimento de carinho e afeto." },
+            { answer: "MESA", theme: "casa", hint: "Móvel usado para apoiar refeições e objetos." },
+            { answer: "BOLA", theme: "brincadeiras", hint: "Objeto redondo usado em muitos esportes." },
+            { answer: "MATO", theme: "natureza", hint: "Vegetação que cresce espontaneamente no terreno." }
+          ],
+          theme: "jardim",
+          hint: "Escolha uma palavra de quatro letras.",
+          attempts: 8,
+          minLetters: 4,
+          maxLetters: 4
+        },
+        medium: {
+          label: "Treino · Médio",
+          rounds: [
+            { answer: "NUVEM", theme: "céu e clima", hint: "Flutua no céu e pode anunciar chuva." },
+            { answer: "MANGA", theme: "frutas", hint: "Fruta tropical de polpa doce e caroço grande." },
+            { answer: "PRAIA", theme: "lugares", hint: "Faixa de areia ou pedras junto ao mar." },
+            { answer: "LIVRO", theme: "cultura", hint: "Reúne páginas para ler uma história ou aprender." },
+            { answer: "CHUVA", theme: "clima", hint: "Cai das nuvens e molha a cidade." },
+            { answer: "NOITE", theme: "tempo", hint: "Período escuro entre o pôr e o nascer do sol." },
+            { answer: "VENTO", theme: "natureza", hint: "Movimento do ar que balança as folhas." },
+            { answer: "BARCO", theme: "navegação", hint: "Veículo que se desloca sobre a água." },
+            { answer: "CAMPO", theme: "lugares", hint: "Área aberta de cultivo ou pastagem." },
+            { answer: "FOLHA", theme: "natureza", hint: "Parte verde que nasce nos galhos das plantas." },
+            { answer: "SONHO", theme: "imaginação", hint: "História que a mente cria durante o sono." },
+            { answer: "TEMPO", theme: "cotidiano", hint: "Pode passar depressa ou mudar com o clima." }
+          ],
+          theme: "céu e clima",
+          hint: "Escolha uma palavra de cinco letras.",
+          attempts: 6,
+          minLetters: 5,
+          maxLetters: 5
+        },
+        hard: {
+          label: "Treino · Difícil",
+          rounds: [
+            { answer: "ESTRELA", theme: "céu e astronomia", hint: "Brilha no céu e pode orientar quem observa a noite." },
+            { answer: "ÁRVORE", theme: "natureza", hint: "Planta de tronco que pode dar sombra e frutos." },
+            { answer: "ABACAXI", theme: "frutas", hint: "Fruta tropical de casca áspera e coroa de folhas." },
+            { answer: "PÊSSEGO", theme: "frutas", hint: "Fruta macia de caroço grande e casca aveludada." }
+          ],
+          theme: "céu e astronomia",
+          hint: "Escolha uma palavra de seis ou sete letras.",
+          attempts: 5,
+          minLetters: 7,
+          maxLetters: 7
+        }
+      };
+      const board = document.getElementById("board");
+      const keyboard = document.getElementById("keyboard");
+      const tries = document.getElementById("tries");
+      const liveRegion = document.getElementById("liveRegion");
+      const toast = document.getElementById("toast");
+      const practicePanel = document.getElementById("practicePanel");
+      const resultPanel = document.getElementById("resultPanel");
+      const shareButton = document.getElementById("shareButton");
+      const challengeLink = document.getElementById("challengeLink");
+      const practiceLink = document.getElementById("practiceLink");
+      let modeKey = "daily";
+      let history = [];
+      let row = 0;
+      let guess = "";
+      let finished = false;
+      let dailyState = null;
+      let toastTimer;
+      let storageWarningShown = false;
+      const dailyStateKey = `entrelinhas:daily:${todayKey}`;
+      const dailyStatsKey = "entrelinhas:daily-stats";
+      const dailyStats = loadDailyStats();
+
+      const currentMode = () => modes[modeKey];
+      const letters = value => Array.from(value.normalize("NFC"));
+      const uppercase = value => value.normalize("NFC").toLocaleUpperCase("pt-BR").normalize("NFC");
+      const stateCopy = () => ({ history: history.map(item => ({ word: item.word, marks: item.marks.slice() })), row, guess, finished, statsUpdated: dailyState ? dailyState.statsUpdated : false });
+
+      function loadDailyStats() {
+        const empty = { played: 0, wins: 0, attempts: 0, streak: 0, lastPlayed: "", distribution: [0, 0, 0, 0, 0, 0], days: [], completed: [] };
+        try {
+          const saved = JSON.parse(localStorage.getItem(dailyStatsKey) || "null");
+          if (!saved || !Number.isInteger(saved.played) || !Number.isInteger(saved.wins) ||
+              !Number.isInteger(saved.attempts) || !Number.isInteger(saved.streak) ||
+              !Array.isArray(saved.distribution) || saved.distribution.length !== 6 ||
+              !saved.distribution.every(value => Number.isInteger(value) && value >= 0) ||
+              !Array.isArray(saved.days)) return empty;
+          return {
+            played: Math.max(0, saved.played),
+            wins: Math.max(0, saved.wins),
+            attempts: Math.max(0, saved.attempts),
+            streak: Math.max(0, saved.streak),
+            lastPlayed: typeof saved.lastPlayed === "string" ? saved.lastPlayed : "",
+            distribution: saved.distribution.slice(),
+            days: saved.days.filter(value => typeof value === "string").slice(-30),
+            completed: Array.isArray(saved.completed) ? saved.completed.filter(value => typeof value === "string").slice(-365) : []
+          };
+        } catch (error) {
+          showStorageWarning(error);
+          return empty;
+        }
+      }
+
+      function saveLocal(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+          return true;
+        } catch (error) {
+          showStorageWarning(error);
+          return false;
+        }
+      }
+
+      function showStorageWarning(error) {
+        if (storageWarningShown) return;
+        storageWarningShown = true;
+        console.error("Não foi possível salvar o progresso local do jogo.", error);
+        window.setTimeout(() => showToast("O navegador não permitiu salvar o progresso. Esta sessão pode não ser retomada."), 0);
+      }
+
+      function rememberDailyState() {
+        if (modeKey !== "daily") return;
+        dailyState = stateCopy();
+        saveLocal(dailyStateKey, dailyState);
+      }
+
+      function readDailyState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(dailyStateKey));
+          const validMarks = marks => Array.isArray(marks) && marks.length === 5 && marks.every(mark => ["correct", "present", "absent"].includes(mark));
+          if (!saved || !Array.isArray(saved.history) || saved.history.length > modes.daily.attempts ||
+              saved.row !== saved.history.length || typeof saved.guess !== "string" ||
+              letters(saved.guess).length > 5 || typeof saved.finished !== "boolean" ||
+              (saved.finished && saved.history.length === 0)) return null;
+          if (!saved.history.every(item => item && typeof item.word === "string" && letters(item.word).length === 5 &&
+              acceptedWords.has(uppercase(item.word)) && validMarks(item.marks) &&
+              JSON.stringify(item.marks) === JSON.stringify(scoreFor(item.word, modes.daily.answer)))) return null;
+          if (saved.history.length && (saved.history.some(item => item.word === modes.daily.answer) ||
+              saved.history.length === modes.daily.attempts) && !saved.finished) return null;
+          return saved;
+        } catch (error) {
+          if (error instanceof SyntaxError) {
+            console.error("O progresso diário salvo está corrompido e será ignorado.", error);
+            return null;
+          }
+          showStorageWarning(error);
+          return null;
+        }
+      }
+
+      function restoreDailyState() {
+        const state = dailyState || readDailyState() || { history: [], row: 0, guess: "", finished: false, statsUpdated: false };
+        dailyState = state;
+        history = state.history.map(item => ({ word: item.word, marks: item.marks.slice() }));
+        row = state.row;
+        guess = state.guess;
+        finished = state.finished;
+      }
+
+      function score(word) {
+        return scoreFor(word, currentMode().answer);
+      }
+
+      function scoreFor(word, answer) {
+        const guessLetters = letters(word);
+        const answerLetters = letters(answer);
+        const result = Array(guessLetters.length).fill("absent");
+        const remaining = answerLetters.slice();
+        for (let i = 0; i < Math.min(guessLetters.length, answerLetters.length); i++) {
+          if (guessLetters[i] === answerLetters[i]) {
+            result[i] = "correct";
+            remaining[i] = null;
+          }
+        }
+        for (let i = 0; i < guessLetters.length; i++) {
+          if (result[i] !== "correct") {
+            const match = remaining.indexOf(guessLetters[i]);
+            if (match !== -1) {
+              result[i] = "present";
+              remaining[match] = null;
+            }
+          }
+        }
+        return result;
+      }
+
+      function updateModeDetails() {
+        const config = currentMode();
+        const training = modeKey !== "daily";
+        document.getElementById("eyebrow").textContent = training ? "Treine no seu ritmo" : "Um desafio, todo dia";
+        document.getElementById("pageTitle").innerHTML = training ? `Palavra <em>${config.label.replace("Treino · ", "")}.</em>` : "Palavra <em>do dia.</em>";
+        document.getElementById("categoryText").textContent = `Categoria: ${config.theme}`;
+        document.getElementById("hintText").textContent = config.hint;
+        document.getElementById("challengeNumber").textContent = training ? config.label : `#${dayOfYear} · ${config.level}`;
+        document.querySelector(".edition").hidden = training;
+        document.querySelector(".game-card").setAttribute("aria-label", training ? config.label : "Desafio diário de palavras");
+        document.querySelector(".side-card").setAttribute("aria-label", training ? "Estatísticas do desafio diário, preservadas durante o treino" : "Estatísticas do desafio diário");
+        document.getElementById("practiceNote").hidden = !training;
+        const length = letters(config.answer).length;
+        board.setAttribute("aria-label", `Tabuleiro com ${config.attempts} tentativas e ${length} letras`);
+        board.style.setProperty("--word-length", length);
+        board.style.setProperty("--board-width", `${length * 54 + (length - 1) * 7}px`);
+        shareButton.disabled = !finished;
+        resultPanel.hidden = !finished;
+        if (finished) renderResult();
+        document.querySelectorAll(".level-button").forEach(button => {
+          button.setAttribute("aria-pressed", String(button.dataset.level === modeKey));
+        });
+      }
+
+      function renderResult() {
+        const training = modeKey !== "daily";
+        const won = history.some(submitted => submitted.word === currentMode().answer);
+        document.getElementById("resultKicker").textContent = training ? "Treino concluído · não conta para suas estatísticas" : "Desafio diário concluído";
+        document.getElementById("resultTitle").textContent = won ? `Você encontrou ${currentMode().answer}!` : `A palavra era ${currentMode().answer}.`;
+        document.getElementById("resultDetail").textContent = won
+          ? `Acertou em ${history.length} ${history.length === 1 ? "tentativa" : "tentativas"}. Compartilhe seu resultado sem revelar a resposta.`
+          : `Rodada encerrada após ${history.length} ${history.length === 1 ? "tentativa" : "tentativas"}. O resultado pode ser compartilhado sem spoiler.`;
+      }
+
+      function createBoard() {
+        const config = currentMode();
+        const length = letters(config.answer).length;
+        board.replaceChildren();
+        for (let r = 0; r < config.attempts; r++) {
+          const boardRow = document.createElement("div");
+          boardRow.className = "board-row";
+          boardRow.setAttribute("role", "row");
+          boardRow.setAttribute("aria-label", `Tentativa ${r + 1}`);
+          boardRow.dataset.row = r;
+          for (let c = 0; c < length; c++) {
+            const tile = document.createElement("div");
+            tile.className = "tile";
+            tile.setAttribute("role", "gridcell");
+            tile.setAttribute("aria-label", `Tentativa ${r + 1}, letra ${c + 1}`);
+            if (r < history.length) {
+              const submitted = history[r];
+              tile.textContent = letters(submitted.word)[c];
+              tile.classList.add("filled", submitted.marks[c]);
+              tile.setAttribute("aria-label", `Tentativa ${r + 1}, ${tile.textContent}, ${submitted.marks[c] === "correct" ? "na posição certa" : submitted.marks[c] === "present" ? "na palavra, em outra posição" : "não aparece na palavra"}`);
+            } else if (r === row && !finished) {
+              const typedLetter = letters(guess)[c];
+              if (typedLetter) {
+                tile.textContent = typedLetter;
+                tile.classList.add("filled");
+              }
+              if (c === letters(guess).length) tile.classList.add("active");
+            }
+            boardRow.append(tile);
+          }
+          board.append(boardRow);
+        }
+        refreshKeyboard();
+      }
+
+      function refreshKeyboard() {
+        document.querySelectorAll(".key[data-letter]").forEach(key => {
+          key.classList.remove("correct", "present", "absent");
+          const letter = uppercase(key.dataset.letter);
+          const states = history.flatMap(submitted => {
+            const wordLetters = letters(submitted.word);
+            return submitted.marks.filter((mark, index) => wordLetters[index] === letter);
+          });
+          let state = "";
+          if (states.includes("correct")) state = "correct";
+          else if (states.includes("present")) state = "present";
+          else if (states.length) state = "absent";
+          if (state) key.classList.add(state);
+          const status = state === "correct" ? "na posição certa" : state === "present" ? "na palavra, em outra posição" : state === "absent" ? "não aparece na palavra" : "";
+          key.setAttribute("aria-label", status ? `${key.textContent.trim()}, ${status}` : key.textContent.trim());
+        });
+      }
+
+      function updateTries() {
+        const remaining = Math.max(0, currentMode().attempts - history.length);
+        tries.innerHTML = `<strong>${history.length} de ${currentMode().attempts}</strong> tentativas usadas · ${remaining} restantes`;
+      }
+
+      function renderStats() {
+        document.getElementById("streakValue").textContent = dailyStats.streak;
+        document.getElementById("streakCaption").textContent = dailyStats.streak
+          ? "Desafios diários concluídos em dias seguidos."
+          : "Conclua o desafio diário para iniciar sua sequência.";
+        document.getElementById("gamesPlayed").textContent = dailyStats.played;
+        document.getElementById("winRate").textContent = dailyStats.played
+          ? `${Math.round(dailyStats.wins / dailyStats.played * 100)}%`
+          : "0%";
+        document.getElementById("averageAttempts").textContent = dailyStats.played
+          ? (dailyStats.attempts / dailyStats.played).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+          : "—";
+        const maximum = Math.max(1, ...dailyStats.distribution);
+        document.querySelectorAll(".bar[data-attempt]").forEach(bar => {
+          const count = dailyStats.distribution[Number(bar.dataset.attempt) - 1];
+          bar.textContent = count;
+          bar.style.width = `${Math.max(4, Math.round(count / maximum * 100))}%`;
+          bar.classList.toggle("current", count > 0 && count === maximum);
+          bar.setAttribute("aria-label", `${bar.dataset.attempt} tentativas: ${count} vitórias`);
+        });
+        const week = document.getElementById("weekActivity");
+        week.replaceChildren();
+        for (let offset = 6; offset >= 0; offset--) {
+          const day = new Date(localDay);
+          day.setDate(day.getDate() - offset);
+          const key = dateKey(day);
+          const dayLabel = new Intl.DateTimeFormat("pt-BR", { weekday: "short" }).format(day).replace(".", "").toLocaleUpperCase("pt-BR");
+          const item = document.createElement("div");
+          item.className = "day";
+          if (dailyStats.days.includes(key)) item.classList.add("done");
+          if (offset === 0) item.classList.add("today");
+          item.setAttribute("aria-label", `${dayLabel}: ${dailyStats.days.includes(key) ? "desafio concluído" : "sem desafio concluído"}${offset === 0 ? ", hoje" : ""}`);
+          const dot = document.createElement("span");
+          dot.className = "day-dot";
+          dot.textContent = dailyStats.days.includes(key) ? "✓" : offset === 0 ? "•" : "";
+          const label = document.createElement("span");
+          label.textContent = offset === 0 ? "HOJE" : dayLabel.slice(0, 3);
+          item.append(dot, label);
+          week.append(item);
+        }
+      }
+
+      function updateStats(won) {
+        if (modeKey !== "daily" || dailyStats.completed.includes(todayKey)) return;
+        dailyStats.played += 1;
+        dailyStats.wins += won ? 1 : 0;
+        dailyStats.attempts += history.length;
+        if (won) dailyStats.distribution[history.length - 1] += 1;
+        const previous = new Date(localDay);
+        previous.setDate(previous.getDate() - 1);
+        dailyStats.streak = dailyStats.lastPlayed === dateKey(previous) ? dailyStats.streak + 1
+          : dailyStats.lastPlayed === todayKey ? dailyStats.streak : 1;
+        dailyStats.lastPlayed = todayKey;
+        dailyStats.days = [...new Set([...dailyStats.days, todayKey])].slice(-30);
+        dailyStats.completed = [...new Set([...dailyStats.completed, todayKey])].slice(-365);
+        saveLocal(dailyStatsKey, dailyStats);
+        renderStats();
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function shakeRow(message) {
+        const tiles = board.querySelectorAll(`.board-row[data-row="${row}"] .tile`);
+        tiles.forEach(tile => {
+          tile.classList.remove("shake");
+          void tile.offsetWidth;
+          tile.classList.add("shake");
+        });
+        liveRegion.textContent = message;
+        showToast(message);
+      }
+
+      function submitGuess() {
+        if (finished) return;
+        const config = currentMode();
+        const guessLength = letters(guess).length;
+        if (guessLength !== letters(config.answer).length) {
+          const requirement = config.minLetters === config.maxLetters
+            ? `as ${config.minLetters} letras`
+            : `de ${config.minLetters} a ${config.maxLetters} letras`;
+          shakeRow(`Complete o palpite com ${requirement} para conferir.`);
+          return;
+        }
+        if (!acceptedWords.has(uppercase(guess))) {
+          shakeRow("Essa palavra não está no vocabulário aceito. Ela não consumiu uma tentativa; tente outra.");
+          return;
+        }
+        const marks = score(guess);
+        const submittedGuess = guess;
+        history.push({ word: submittedGuess, marks });
+        const won = submittedGuess === config.answer;
+        row++;
+        guess = "";
+        rememberDailyState();
+        refreshKeyboard();
+        if (won || row === config.attempts) {
+          finished = true;
+          rememberDailyState();
+          updateTries();
+          createBoard();
+          resultPanel.hidden = false;
+          shareButton.disabled = false;
+          renderResult();
+          updateStats(won);
+          rememberDailyState();
+          liveRegion.textContent = won ? "Você encontrou a palavra!" : `Fim de jogo. A palavra era ${config.answer}.`;
+          showToast(won ? "Boa! Palavra encontrada. ✨" : `A palavra era ${config.answer}.`);
+          return;
+        }
+        updateTries();
+        createBoard();
+        const descriptions = { correct: "posição certa", present: "presente em outra posição", absent: "ausente" };
+        const feedback = letters(submittedGuess).map((letter, index) => `${letter}: ${descriptions[marks[index]]}`).join("; ");
+        liveRegion.textContent = `Tentativa ${row} registrada. ${feedback}. ${config.attempts - row} tentativas restantes.`;
+      }
+
+      function addLetter(letter) {
+        if (finished || letters(guess).length >= letters(currentMode().answer).length) return;
+        const next = uppercase(letter);
+        if (!/^\p{L}$/u.test(next)) return;
+        guess = (guess + next).normalize("NFC");
+        rememberDailyState();
+        createBoard();
+      }
+      function removeLetter() {
+        const typed = letters(guess);
+        if (finished || !typed.length) return;
+        guess = typed.slice(0, -1).join("");
+        rememberDailyState();
+        createBoard();
+      }
+
+      keyboard.addEventListener("click", event => {
+        const key = event.target.closest("button");
+        if (!key) return;
+        if (key.dataset.letter) addLetter(key.dataset.letter);
+        else if (key.dataset.action === "delete") removeLetter();
+        else if (key.dataset.action === "enter") submitGuess();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.key === "Enter" && event.target instanceof HTMLElement && event.target.closest("button")) return;
+        if (/^\p{L}$/u.test(event.key)) {
+          event.preventDefault();
+          addLetter(event.key);
+        } else if (event.key === "Backspace") {
+          event.preventDefault();
+          removeLetter();
+        } else if (event.key === "Enter") {
+          event.preventDefault();
+          submitGuess();
+        }
+      });
+
+      document.getElementById("shareButton").addEventListener("click", async () => {
+        if (!finished) return;
+        const result = history.map(submitted => submitted.marks.map(mark => mark === "correct" ? "✓" : mark === "present" ? "↗" : "×").join("")).join("\n");
+        const label = modeKey === "daily"
+          ? `entrelinhas · desafio diário #${dayOfYear} · nível ${currentMode().level.toLocaleLowerCase("pt-BR")}`
+          : `entrelinhas · ${currentMode().label} (não altera estatísticas)`;
+        const outcome = history.some(submitted => submitted.word === currentMode().answer) ? "Acertou" : "Não encontrou";
+        const text = `${label}\n${outcome} · ${history.length}/${currentMode().attempts} tentativas\n✓ posição certa · ↗ letra em outra posição · × ausente\n\n${result}\n\nJogue também: Palavra do dia`;
+        if (navigator.share) {
+          try {
+            await navigator.share({ text });
+            showToast("Resultado compartilhado — sem spoilers. ✨");
+            return;
+          } catch (error) {
+            if (error.name === "AbortError") return;
+            console.error("O compartilhamento do dispositivo falhou.", error);
+          }
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const field = document.createElement("textarea");
+            field.value = text;
+            field.setAttribute("readonly", "");
+            field.style.position = "fixed";
+            field.style.opacity = "0";
+            document.body.append(field);
+            field.select();
+            const copied = document.execCommand("copy");
+            field.remove();
+            if (!copied) throw new Error("O navegador recusou a cópia para a área de transferência.");
+          }
+          showToast("Resultado copiado — sem spoilers. ✨");
+        } catch (error) {
+          console.error("Não foi possível compartilhar ou copiar o resultado.", error);
+          showToast("Não foi possível compartilhar ou copiar agora. Tente novamente.");
+        }
+      });
+
+      document.getElementById("helpButton").addEventListener("click", () => {
+        const config = currentMode();
+        showToast(`Adivinhe a palavra em até ${config.attempts} tentativas. ✓ posição certa; ↗ letra em outro lugar; × ausente. Acentos são diferentes.`);
+      });
+      function openPractice() {
+        rememberDailyState();
+        startTrainingRound("easy");
+        practicePanel.hidden = false;
+        challengeLink.classList.remove("active");
+        challengeLink.setAttribute("aria-pressed", "false");
+        practiceLink.classList.add("active");
+        practiceLink.setAttribute("aria-pressed", "true");
+        updateModeDetails();
+        updateTries();
+        createBoard();
+        liveRegion.textContent = "Fácil está selecionado. Escolha outro nível ou jogue esta rodada de treino.";
+        practicePanel.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      function startTrainingRound(level) {
+        modeKey = level;
+        const config = currentMode();
+        const puzzle = config.rounds[Math.floor(Math.random() * config.rounds.length)];
+        config.answer = puzzle.answer;
+        config.theme = puzzle.theme;
+        config.hint = puzzle.hint;
+        history = [];
+        row = 0;
+        guess = "";
+        finished = false;
+      }
+      practiceLink.addEventListener("click", openPractice);
+      document.getElementById("practiceButton").addEventListener("click", openPractice);
+      document.querySelectorAll(".level-button").forEach(button => {
+        button.addEventListener("click", () => {
+          startTrainingRound(button.dataset.level);
+          updateModeDetails();
+          updateTries();
+          createBoard();
+          liveRegion.textContent = `${currentMode().label}: rodada iniciada. ${currentMode().attempts} palpites disponíveis.`;
+        });
+      });
+      challengeLink.addEventListener("click", () => {
+        if (modeKey === "daily") {
+          liveRegion.textContent = finished ? "Seu desafio diário já foi concluído nesta sessão." : "Você está no desafio diário.";
+          return;
+        }
+        modeKey = "daily";
+        restoreDailyState();
+        practicePanel.hidden = true;
+        challengeLink.classList.add("active");
+        challengeLink.setAttribute("aria-pressed", "true");
+        practiceLink.classList.remove("active");
+        practiceLink.setAttribute("aria-pressed", "false");
+        updateModeDetails();
+        updateTries();
+        createBoard();
+        liveRegion.textContent = finished ? "Seu desafio diário já foi concluído nesta sessão." : "Desafio diário retomado. Adivinhe a palavra em seis tentativas.";
+      });
+      document.getElementById("archiveLink").addEventListener("click", () => {
+        showToast("O arquivo premium ainda não está disponível nesta versão demonstrativa.");
+      });
+
+      document.getElementById("editionDate").textContent = new Intl.DateTimeFormat("pt-BR", { weekday: "short", day: "2-digit", month: "short" }).format(localDay).replace(/\./g, "").toLocaleUpperCase("pt-BR");
+      document.getElementById("editionNumber").textContent = `edição #${dayOfYear}`;
+      restoreDailyState();
+      updateModeDetails();
+      updateTries();
+      createBoard();
+      renderStats();
+      if (finished && !dailyState.statsUpdated && !dailyStats.completed.includes(todayKey)) {
+        updateStats(history.some(item => item.word === currentMode().answer));
+        dailyState = { ...stateCopy(), statsUpdated: true };
+        saveLocal(dailyStateKey, dailyState);
+      }
+    })();
+  </script>
+</body>
+</html>
